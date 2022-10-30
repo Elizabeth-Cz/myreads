@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
-import * as BooksAPI from "../BooksAPI";
+import Book from "./Book";
 
-const SearchPage = ({ setShowSearchpage, showSearchPage, results }) => {
-  const [searchOutput, setSearchOutput] = useState();
+const SearchPage = ({
+  searchBooks,
+  setShowSearchpage,
+  showSearchPage,
+  results,
+}) => {
   const handleSearch = (e) => {
     searchBooks(e.target.value);
   };
 
-  const searchBooks = async (q) => {
-    BooksAPI.search(q).then((results) => {
-      console.log(results);
-    });
-  };
   return (
     <div className="search-books">
       <div className="search-books-bar">
@@ -30,9 +28,13 @@ const SearchPage = ({ setShowSearchpage, showSearchPage, results }) => {
         </div>
       </div>
       <div className="search-books-results">
-        <ol className="books-grid">
-          {results && results.map((result) => console.log(result))}
-        </ol>
+        {results && (
+          <ol className="books-grid">
+            {results.map((result) => (
+              <Book book={result} key={result.id} />
+            ))}
+          </ol>
+        )}
       </div>
     </div>
   );

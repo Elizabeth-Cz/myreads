@@ -24,21 +24,27 @@ function App() {
     });
     setBooks(updatedBooks);
   };
+  const searchBooks = async (q) => {
+    BooksAPI.search(q).then((results) => {
+      console.log(results);
+      setResults(results);
+    });
+  };
 
   useEffect(() => {
     BooksAPI.getAll().then((books) => {
       setBooks(books);
-    });
-    BooksAPI.search().then((results) => {
-      setResults(results);
-      console.log(results);
     });
   }, []);
 
   return (
     <div className="app">
       {showSearchPage ? (
-        <SearchPage setShowSearchpage={setShowSearchpage} results={results} />
+        <SearchPage
+          searchBooks={searchBooks}
+          setShowSearchpage={setShowSearchpage}
+          results={results}
+        />
       ) : (
         <div className="list-books">
           <PageTitle title="My Reads" />
