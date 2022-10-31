@@ -10,8 +10,10 @@ function App() {
   const [showSearchPage, setShowSearchpage] = useState(false);
   const [books, setBooks] = useState([]);
   const [results, setResults] = useState();
+  const [error, setError] = useState("");
 
   const updateBooks = (book, shelf) => {
+    console.log(book);
     BooksAPI.update(book, shelf);
     const updatedBooks = books.map((currentBook) => {
       if (book.id === currentBook.id) {
@@ -22,13 +24,28 @@ function App() {
       }
       return currentBook;
     });
+    if (!books.find((b) => b.id === book.id)) {
+      updatedBooks.push(book);
+    }
     setBooks(updatedBooks);
   };
-  const searchBooks = async (q) => {
-    BooksAPI.search(q).then((results) => {
-      console.log(results);
-      setResults(results);
-    });
+
+  const searchBooks = async (query) => {
+    BooksAPI.search(query)
+      .then((results) => {
+        if (results.error) {
+          setError("no results found");
+          setResults([]);
+          return;
+        }
+        if (results.length === 0) {
+          setResults([]);
+          return;
+        }
+        setResults(results);
+        setError("");
+      })
+      .catch((err) => setError(JSON.stringify(err)));
   };
 
   useEffect(() => {
@@ -41,9 +58,12 @@ function App() {
     <div className="app">
       {showSearchPage ? (
         <SearchPage
+          error={error}
           searchBooks={searchBooks}
           setShowSearchpage={setShowSearchpage}
+          showSearchPage={showSearchPage}
           results={results}
+          updateBooks={updateBooks}
         />
       ) : (
         <div className="list-books">

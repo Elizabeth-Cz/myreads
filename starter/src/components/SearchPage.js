@@ -4,7 +4,9 @@ const SearchPage = ({
   searchBooks,
   setShowSearchpage,
   showSearchPage,
-  results,
+  results = [],
+  updateBooks,
+  error,
 }) => {
   const handleSearch = (e) => {
     searchBooks(e.target.value);
@@ -13,12 +15,14 @@ const SearchPage = ({
   return (
     <div className="search-books">
       <div className="search-books-bar">
-        <a
+        <button
           className="close-search"
-          onClick={() => setShowSearchpage(!showSearchPage)}
+          onClick={() => {
+            setShowSearchpage(!showSearchPage);
+          }}
         >
           Close
-        </a>
+        </button>
         <div className="search-books-input-wrapper">
           <input
             type="text"
@@ -28,13 +32,13 @@ const SearchPage = ({
         </div>
       </div>
       <div className="search-books-results">
-        {results && (
-          <ol className="books-grid">
-            {results.map((result) => (
-              <Book book={result} key={result.id} />
+        {error && <p>{error}</p>}
+        <ol className="books-grid">
+          {results &&
+            results.map((book) => (
+              <Book book={book} key={book.id} updateBooks={updateBooks} />
             ))}
-          </ol>
-        )}
+        </ol>
       </div>
     </div>
   );

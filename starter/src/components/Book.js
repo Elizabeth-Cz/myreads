@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 // import BookShelfChanger from "./BookShelfChanger";
-// import * as BooksAPI from "../BooksAPI";
 
 const Book = ({ book, updateBooks }) => {
   const [shelf, setShelf] = useState(book.shelf);
 
-  const changeShelf = (e) => {
-    setShelf(e.target.value);
-  };
-
-  useEffect(() => {
+  const changeShelf = (book, shelf) => {
+    setShelf(shelf);
+    console.log("book: ", book, "shelf: ", shelf);
     if (book.shelf !== shelf) {
       updateBooks(book, shelf);
     }
-  }, [book, shelf, updateBooks]);
+  };
 
   return (
     <div className="book">
@@ -23,12 +20,16 @@ const Book = ({ book, updateBooks }) => {
           style={{
             width: 128,
             height: 193,
-            backgroundImage: `url(${book.imageLinks.thumbnail})`,
+            backgroundImage: `url(${
+              book.imageLinks && book.imageLinks.thumbnail
+            })`,
           }}
         ></div>
-        {/* <BookShelfChanger shelf={shelf} changeShelf={changeShelf} /> */}
         <div className="book-shelf-changer">
-          <select defaultValue={shelf} onChange={changeShelf}>
+          <select
+            defaultValue={shelf}
+            onChange={(e) => changeShelf(book, e.target.value)}
+          >
             <option value="none" disabled>
               Move to...
             </option>
@@ -38,9 +39,13 @@ const Book = ({ book, updateBooks }) => {
             <option value="none">None</option>
           </select>
         </div>
+        {/* <BookShelfChanger shelf={shelf} changeShelf={changeShelf} book={book} /> */}
       </div>
       <div className="book-title">{book.title}</div>
-      <div className="book-authors">{book.authors[0]}</div>
+      <div className="book-authors">
+        {book.authors &&
+          book.authors.map((author) => <div key={author}>{author}</div>)}
+      </div>
     </div>
   );
 };
