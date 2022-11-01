@@ -1,77 +1,71 @@
 import "./App.css";
-import { useState, useEffect } from "react";
-import Shelf from "./components/Shelf";
-import * as BooksAPI from "./BooksAPI";
-import PageTitle from "./components/PageTitle";
+import { useEffect, useState } from "react";
 import SearchPage from "./components/SearchPage";
-import SearchButton from "./components/SearchButton";
+import PageTitle from "./components/PageTitle";
+import Shelf from "./components/Shelf";
+import * as BookAPI from "./BooksAPI";
 
 function App() {
   const [showSearchPage, setShowSearchpage] = useState(false);
   const [books, setBooks] = useState([]);
-  const [results, setResults] = useState();
+
+  const getBooks = async () => {
+    BookAPI.getAll().then((books) => setBooks(books));
+  };
 
   const updateBooks = (book, shelf) => {
-    BooksAPI.update(book, shelf);
-    const updatedBooks = books.map((currentBook) => {
-      if (book.id === currentBook.id) {
-        return {
-          ...currentBook,
-          shelf: shelf,
-        };
-      }
-      return currentBook;
-    });
-    setBooks(updatedBooks);
-  };
-  const searchBooks = async (q) => {
-    BooksAPI.search(q).then((results) => {
-      console.log(results);
-      setResults(results);
+    console.log("book: ", book, "| shelf: ", shelf);
+    BookAPI.update(book, shelf);
+    const updatedBooks = books.map((b) => {
+      book.shelf = b.shelf;
+      b.shelf !== book.shelf
+        ? console.log("book: ", book, " is not in ", shelf)
+        : console.log("book ", book, " is in ", shelf);
+      return updatedBooks;
     });
   };
 
   useEffect(() => {
-    BooksAPI.getAll().then((books) => {
-      setBooks(books);
-    });
+    getBooks();
   }, []);
 
   return (
     <div className="app">
       {showSearchPage ? (
         <SearchPage
-          searchBooks={searchBooks}
+          showSearchPage={showSearchPage}
           setShowSearchpage={setShowSearchpage}
-          results={results}
         />
       ) : (
         <div className="list-books">
-          <PageTitle title="My Reads" />
+          <PageTitle title="My Reads App" />
           <div className="list-books-content">
-            <Shelf
-              updateBooks={updateBooks}
-              key="currentlyReading"
-              shelfTitle="Currently Reading"
-              books={books.filter((book) => book.shelf === "currentlyReading")}
-            />
-            <Shelf
-              updateBooks={updateBooks}
-              key="wantToRead"
-              shelfTitle="Want to Read"
-              books={books.filter((book) => book.shelf === "wantToRead")}
-            />
-            <Shelf
-              updateBooks={updateBooks}
-              key="read"
-              shelfTitle="Read"
-              books={books.filter((book) => book.shelf === "read")}
-            />
+            <div>
+              <Shelf
+                shelfTitle="Currently Reading"
+                books={books.filter(
+                  (book) => book.shelf === "currentlyReading"
+                )}
+                key="currentlyReading"
+                updateBooks={updateBooks}
+              />
+              <Shelf
+                shelfTitle="Want to Read"
+                books={books.filter((book) => book.shelf === "wantToRead")}
+                updateBooks={updateBooks}
+                key="wantToRead"
+              />
+              <Shelf
+                shelfTitle="Already Read"
+                updateBooks={updateBooks}
+                books={books.filter((book) => book.shelf === "read")}
+                key="alreadyRead"
+              />
+            </div>
           </div>
-          <SearchButton
-            setShowSearchpage={setShowSearchpage}
-            showSearchPage={showSearchPage}
-          />
+          <div className="open-search">
+            <a onClick={() => setShowSearchpage(!showSearchPage)}>Add a book</a>
+          </div>
         </div>
       )}
     </div>

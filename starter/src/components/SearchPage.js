@@ -1,40 +1,19 @@
-import Book from "./Book";
-
-const SearchPage = ({
-  searchBooks,
-  setShowSearchpage,
-  showSearchPage,
-  results,
-}) => {
-  const handleSearch = (e) => {
-    searchBooks(e.target.value);
-  };
-
+const SearchPage = ({ showSearchPage, setShowSearchpage }) => {
   return (
     <div className="search-books">
       <div className="search-books-bar">
-        <a
+        <button
           className="close-search"
           onClick={() => setShowSearchpage(!showSearchPage)}
         >
           Close
-        </a>
+        </button>
         <div className="search-books-input-wrapper">
-          <input
-            type="text"
-            placeholder="Search by title, author, or ISBN"
-            onChange={handleSearch}
-          />
+          <input type="text" placeholder="Search by title, author, or ISBN" />
         </div>
       </div>
       <div className="search-books-results">
-        {results && (
-          <ol className="books-grid">
-            {results.map((result) => (
-              <Book book={result} key={result.id} />
-            ))}
-          </ol>
-        )}
+        <ol className="books-grid"></ol>
       </div>
     </div>
   );
