@@ -1,4 +1,15 @@
+import { useState } from "react";
+
 const Book = ({ book, updateBooks }) => {
+  const [shelf, setShelf] = useState(book.shelf);
+
+  const changeShelf = (book, shelf) => {
+    setShelf(shelf);
+    if (book.shelf !== shelf) {
+      updateBooks(book, shelf);
+    }
+  };
+
   return (
     <li>
       <div className="book">
@@ -14,10 +25,11 @@ const Book = ({ book, updateBooks }) => {
             }}
           ></div>
           <div className="book-shelf-changer">
-            <select onChange={(e) => updateBooks(book, e.target.value)}>
-              <option value="none" disabled>
-                Move to...
-              </option>
+            <select
+              defaultValue={shelf}
+              onChange={(e) => changeShelf(book, e.target.value)}
+            >
+              <option value="none">Move to...</option>
               <option value="currentlyReading">Currently Reading</option>
               <option value="wantToRead">Want to Read</option>
               <option value="read">Read</option>
@@ -27,9 +39,8 @@ const Book = ({ book, updateBooks }) => {
         </div>
         <div className="book-title">{book.title}</div>
         <div className="book-authors">
-          {book.authors.map((author) => (
-            <div>{author}</div>
-          ))}
+          {book.authors &&
+            book.authors.map((author) => <div key={author}>{author}</div>)}
         </div>
       </div>
     </li>

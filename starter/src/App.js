@@ -3,31 +3,56 @@ import { useEffect, useState } from "react";
 import SearchPage from "./components/SearchPage";
 import PageTitle from "./components/PageTitle";
 import Shelf from "./components/Shelf";
-import * as BookAPI from "./BooksAPI";
+import * as BooksAPI from "./BooksAPI";
 
 function App() {
   const [showSearchPage, setShowSearchpage] = useState(false);
   const [books, setBooks] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [error, setError] = useState("");
 
   const getBooks = async () => {
-    BookAPI.getAll().then((books) => setBooks(books));
+    BooksAPI.getAll().then((books) => setBooks(books));
+  };
+
+  const searchBooks = async (query) => {
+    BooksAPI.search(query).then((response) => {
+      if (!response) {
+        console.log("no response");
+        setError("No results");
+        setSearchResults([]);
+        return;
+      }
+      if (response.error) {
+        console.log("response has error", response.error);
+        setError("No results found");
+        setSearchResults([]);
+        return;
+      }
+      setSearchResults(response);
+    });
   };
 
   const updateBooks = (book, shelf) => {
-    console.log("book: ", book, "| shelf: ", shelf);
-    BookAPI.update(book, shelf);
-    const updatedBooks = books.map((b) => {
-      book.shelf = b.shelf;
-      b.shelf !== book.shelf
-        ? console.log("book: ", book, " is not in ", shelf)
-        : console.log("book ", book, " is in ", shelf);
-      return updatedBooks;
+    BooksAPI.update(book, shelf);
+    const updatedBooks = books.map((currentBook) => {
+      if (currentBook.id === book.id) {
+        return {
+          ...currentBook,
+          shelf: shelf,
+        };
+      }
+      return currentBook;
     });
+    if (!books.find((b) => b.id === book.id)) {
+      updatedBooks.push(book);
+    }
+    setBooks(updatedBooks);
   };
 
   useEffect(() => {
     getBooks();
-  }, []);
+  }, [searchResults]);
 
   return (
     <div className="app">
@@ -35,6 +60,12 @@ function App() {
         <SearchPage
           showSearchPage={showSearchPage}
           setShowSearchpage={setShowSearchpage}
+          searchBooks={searchBooks}
+          searchResults={searchResults}
+          setSearchResults={setSearchResults}
+          error={error}
+          updateBooks={updateBooks}
+          books={books}
         />
       ) : (
         <div className="list-books">
@@ -59,12 +90,17 @@ function App() {
                 shelfTitle="Already Read"
                 updateBooks={updateBooks}
                 books={books.filter((book) => book.shelf === "read")}
-                key="alreadyRead"
+                key="read"
               />
             </div>
           </div>
           <div className="open-search">
-            <a onClick={() => setShowSearchpage(!showSearchPage)}>Add a book</a>
+            <button
+              setSearchResults={setSearchResults}
+              onClick={() => setShowSearchpage(!showSearchPage)}
+            >
+              Add a book
+            </button>
           </div>
         </div>
       )}
