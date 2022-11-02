@@ -1,16 +1,29 @@
+import { useEffect, useState } from "react";
 import Book from "./Book";
-
 const SearchPage = ({
-  searchBooks,
-  setShowSearchpage,
   showSearchPage,
-  results = [],
-  updateBooks,
+  setShowSearchpage,
+  searchBooks,
+  searchResults,
+  setSearchResults,
   error,
+  updateBooks,
+  books,
 }) => {
-  const handleSearch = (e) => {
-    searchBooks(e.target.value);
-  };
+  const [compared, setCompared] = useState(null);
+
+  useEffect(() => {
+    if (searchResults) {
+      const double = searchResults.map((b) => {
+        const existingBook = books.find((book) => book.id === b.id);
+        if (existingBook) {
+          return existingBook;
+        }
+        return b;
+      });
+      setCompared(double);
+    }
+  }, [searchResults]);
 
   return (
     <div className="search-books">
@@ -19,6 +32,7 @@ const SearchPage = ({
           className="close-search"
           onClick={() => {
             setShowSearchpage(!showSearchPage);
+            setSearchResults();
           }}
         >
           Close
@@ -27,17 +41,19 @@ const SearchPage = ({
           <input
             type="text"
             placeholder="Search by title, author, or ISBN"
-            onChange={handleSearch}
+            onChange={(e) => searchBooks(e.target.value)}
           />
         </div>
       </div>
       <div className="search-books-results">
-        {error && <p>{error}</p>}
         <ol className="books-grid">
-          {results &&
-            results.map((book) => (
+          {compared ? (
+            compared.map((book) => (
               <Book book={book} key={book.id} updateBooks={updateBooks} />
-            ))}
+            ))
+          ) : (
+            <p>{error}</p>
+          )}
         </ol>
       </div>
     </div>
