@@ -23,7 +23,7 @@ const SearchPage = ({
       });
       setCompared(double);
     }
-  }, [searchResults]);
+  }, [searchResults, books]);
 
   return (
     <div className="search-books">

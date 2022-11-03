@@ -18,13 +18,11 @@ function App() {
   const searchBooks = async (query) => {
     BooksAPI.search(query).then((response) => {
       if (!response) {
-        console.log("no response");
         setError("No results");
         setSearchResults([]);
         return;
       }
       if (response.error) {
-        console.log("response has error", response.error);
         setError("No results found");
         setSearchResults([]);
         return;
@@ -87,7 +85,7 @@ function App() {
                 key="wantToRead"
               />
               <Shelf
-                shelfTitle="Already Read"
+                shelfTitle="Read"
                 updateBooks={updateBooks}
                 books={books.filter((book) => book.shelf === "read")}
                 key="read"
@@ -95,10 +93,7 @@ function App() {
             </div>
           </div>
           <div className="open-search">
-            <button
-              setSearchResults={setSearchResults}
-              onClick={() => setShowSearchpage(!showSearchPage)}
-            >
+            <button onClick={() => setShowSearchpage(!showSearchPage)}>
               Add a book
             </button>
           </div>
